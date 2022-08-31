@@ -82,7 +82,7 @@ app.patch("/list/:id", async (req, res) => {
     `
 UPDATE BOARD
 SET board_title = ?,
-board_content = ?,
+board_content = ?
 WHERE id = ?
 `,
     [board_title, board_content, id]
@@ -92,5 +92,31 @@ WHERE id = ?
   });
 });
 //수정
+// 삭제
+app.delete("/list/:id", async (req, res) => {
+  const { id } = req.params;
+  const [[row]] = await pool.query(
+    `
+    SELECT *
+    FROM BOARD
+    WHERE id = ?`,
+    [id]
+  );
+  if (row === undefined) {
+    res.status(404).json({
+      msg: "not found",
+    });
+    return;
+  }
+  const [rs] = await pool.query(
+    `
+    DELETE FROM BOARD
+    WHERE id = ?`,
+    [id]
+  );
+  res.json({
+    msg: `${id}번 할 일이 삭제되었습니다.`
+  })
+});
 
 app.listen(port);
