@@ -7,23 +7,90 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const pool = mysql.createPool({
-    host: "localhost",
-    user: "sbsst",
-    password: "sbs123414",
-    database: "a1",
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-});
-
-
 const port = 8000;
 
-app.get("/", async (req, res) => {
-    const [rows] = await pool.query("SELECT * FROM todo ORDER BY id DESC");
-
-    res.json(rows);
+const pool = mysql.createPool({
+  host: "localhost",
+  user: "sbsst",
+  password: "sbs123414",
+  database: "a1",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
+
+// app.get("/list", async (req, res) => {
+//   const [rows] = await pool.query("SELECT * FROM BOARD");
+//   res.json(rows);
+// });
+
+// // 단건조회
+app.get("/list/:id", async (req, res) => {
+  const { id } = req.params;
+  const [rows] = await pool.query(
+    `
+    SELECT *
+    FROM BOARD
+    WHERE id = ?
+    `,
+    [id]
+  );
+  if (rows.length == 0) {
+    res.status(404).json({
+      msg: "not found",
+    });
+    return;
+  }
+  res.json(rows[0]);
+});
+// 단건조회
+// 수정
+app.patch("/list/:id", async (req, res) => {
+  const { id } = req.params;
+  const { board_title, board_content } = req.body;
+
+  const [rows] = await pool.query(
+    `
+    SELECT *
+    FROM BOARD
+    WHERE id= ?
+    `,
+    [id]
+  );
+
+  if (rows.length === 0) {
+    res.status(404).json({
+      msg: "not found",
+    });
+  }
+
+  if (!board_title) {
+    res.status(400).json({
+      msg: "제목이 비었습니다.",
+    });
+    return;
+  }
+
+  if (!board_content) {
+    res.status(400).json({
+      msg: "내용이 비었습니다.",
+    });
+    return;
+  }
+
+  const [rs] = await pool.query(
+    `
+UPDATE BOARD
+SET board_title = ?,
+board_content = ?,
+WHERE id = ?
+`,
+    [board_title, board_content, id]
+  );
+  res.json({
+    msg: `${id}번 할 일이 수정되었습니다.`,
+  });
+});
+//수정
 
 app.listen(port);
