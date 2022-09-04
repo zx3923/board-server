@@ -19,10 +19,10 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-// app.get("/list", async (req, res) => {
-//   const [rows] = await pool.query("SELECT * FROM BOARD");
-//   res.json(rows);
-// });
+app.get("/list", async (req, res) => {
+  const [rows] = await pool.query("SELECT * FROM BOARD");
+  res.json(rows);
+});
 
 // // 단건조회
 app.get("/list/:id", async (req, res) => {
@@ -44,6 +44,28 @@ app.get("/list/:id", async (req, res) => {
   res.json(rows[0]);
 });
 // 단건조회
+// 추가
+// app.post("/list", async (req, res) => {
+//   const { body: { text }, } = req;
+//   await pool.query(
+//     `
+//     INSERT INTO BOARD
+//     SET REGISTTER_DATE = NOW(),
+//     board_content = ?
+//     `,
+//     [text]
+//   );
+//   const [updatedTitles] = await pool.query(
+//     `
+//     SELECT *
+//     FROM BOARD
+//     ORDER BY id DESC
+//     `
+//   );
+//   res.json(updatedTitles);
+// });
+
+// 추가
 // 수정
 app.patch("/list/:id", async (req, res) => {
   const { id } = req.params;
