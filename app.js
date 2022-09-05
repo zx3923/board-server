@@ -45,25 +45,27 @@ app.get("/list/:id", async (req, res) => {
 });
 // 단건조회
 // 추가
-// app.post("/list", async (req, res) => {
-//   const { body: { text }, } = req;
-//   await pool.query(
-//     `
-//     INSERT INTO BOARD
-//     SET REGISTTER_DATE = NOW(),
-//     board_content = ?
-//     `,
-//     [text]
-//   );
-//   const [updatedTitles] = await pool.query(
-//     `
-//     SELECT *
-//     FROM BOARD
-//     ORDER BY id DESC
-//     `
-//   );
-//   res.json(updatedTitles);
-// });
+app.post("/list", async (req, res) => {
+  const {
+    body: { board_content },
+  } = req;
+  await pool.query(
+    `
+    INSERT INTO BOARD
+    SET register_date = NOW(),
+        board_content = ?
+    `,
+    [board_content]
+  );
+  const [updatedTitles] = await pool.query(
+    `
+    SELECT *
+    FROM BOARD
+    ORDER BY id DESC
+    `
+  );
+  res.json(updatedTitles);
+});
 
 // 추가
 // 수정
@@ -137,8 +139,8 @@ app.delete("/list/:id", async (req, res) => {
     [id]
   );
   res.json({
-    msg: `${id}번 할 일이 삭제되었습니다.`
-  })
+    msg: `${id}번 할 일이 삭제되었습니다.`,
+  });
 });
 
 app.listen(port);
